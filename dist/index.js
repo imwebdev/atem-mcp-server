@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Redirect all console.log to stderr so stdout stays clean for MCP JSON-RPC
-const originalLog = console.log;
+// IMPORTANT: Redirect console.log to stderr so stdout stays clean for MCP JSON-RPC.
+// Some dependencies (notably atem-connection with Node v25+) write debug info to stdout
+// which corrupts the MCP protocol communication. This must be the very first line.
 console.log = console.error;
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
