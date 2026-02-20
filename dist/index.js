@@ -5,12 +5,16 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { registerConnectionTools } from './tools/connection.js';
 import { registerSwitchingTools } from './tools/switching.js';
 import { registerTransitionTools } from './tools/transitions.js';
 import { registerRoutingTools } from './tools/routing.js';
 import { registerMacroTools, registerRecordingStreamingTools } from './tools/macros-recording.js';
 import { registerAudioTools } from './tools/audio.js';
+import { registerSuperSourceTools } from './tools/supersource.js';
+import { registerMediaTools } from './tools/media.js';
 function createServer() {
     const server = new McpServer({
         name: 'atem-mcp-server',
@@ -23,6 +27,8 @@ function createServer() {
     registerMacroTools(server);
     registerRecordingStreamingTools(server);
     registerAudioTools(server);
+    registerSuperSourceTools(server);
+    registerMediaTools(server);
     return server;
 }
 function autoConnect() {
@@ -46,6 +52,10 @@ async function runStdio() {
 async function runHTTP() {
     const app = express();
     app.use(express.json());
+    // Serve static files from /public (dashboard, etc.)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    app.use(express.static(join(__dirname, '..', 'public')));
     app.get('/health', (_req, res) => {
         res.json({ status: 'ok', server: 'atem-mcp-server', version: '1.1.0' });
     });

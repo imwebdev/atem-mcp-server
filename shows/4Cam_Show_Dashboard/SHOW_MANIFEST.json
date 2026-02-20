@@ -1,0 +1,124 @@
+{
+  "showName": "4Cam_Show_Dashboard",
+  "version": "1.0.0",
+  "videoStandard": "1080p29.97",
+  "switcher": {
+    "mixEffects": 1,
+    "downstreamKeyers": 2,
+    "superSourceAvailable": true,
+    "defaultME": 0
+  },
+  "inputs": [
+    { "id": 1, "label": "CAM1", "shortLabel": "CM1", "alias": "HOST", "type": "camera", "connector": "SDI" },
+    { "id": 2, "label": "CAM2", "shortLabel": "CM2", "alias": "GUEST", "type": "camera", "connector": "SDI" },
+    { "id": 3, "label": "CAM3", "shortLabel": "CM3", "alias": null, "type": "camera", "connector": "SDI" },
+    { "id": 4, "label": "CAM4", "shortLabel": "CM4", "alias": null, "type": "camera", "connector": "SDI" },
+    { "id": 3010, "label": "MP1_TITLE", "shortLabel": "TITL", "type": "mediaPlayer", "description": "Media Player 1 - Title Slide" },
+    { "id": 3011, "label": "MP1_KEY", "shortLabel": "TK1", "type": "mediaPlayerKey", "description": "Media Player 1 Key" },
+    { "id": 3020, "label": "MP2_LOGO", "shortLabel": "LOGO", "type": "mediaPlayer", "description": "Media Player 2 - Logo Bug" },
+    { "id": 3021, "label": "MP2_KEY", "shortLabel": "LK2", "type": "mediaPlayerKey", "description": "Media Player 2 Key" },
+    { "id": 6000, "label": "SS_2UP", "shortLabel": "SS", "type": "superSource", "description": "SuperSource 2-Up Layout" },
+    { "id": 10010, "label": "BLACK", "shortLabel": "BLK", "type": "internal" },
+    { "id": 2001, "label": "COLOR1", "shortLabel": "CL1", "type": "colorGenerator" }
+  ],
+  "overlays": {
+    "title": {
+      "name": "Title Slide",
+      "implementation": "DSK1",
+      "dskIndex": 0,
+      "fillSource": 3010,
+      "keySource": 3011,
+      "mediaPlayerIndex": 0,
+      "mediaPoolStillIndex": 0,
+      "behavior": {
+        "type": "fullFrameOverlay",
+        "fadeRate": 20,
+        "description": "Full-frame title card overlay via DSK1 with fade transition"
+      }
+    },
+    "logo": {
+      "name": "Logo Bug",
+      "implementation": "DSK2",
+      "dskIndex": 1,
+      "fillSource": 3020,
+      "keySource": 3021,
+      "mediaPlayerIndex": 1,
+      "mediaPoolStillIndex": 1,
+      "behavior": {
+        "type": "cornerBug",
+        "persistent": true,
+        "description": "Persistent corner logo bug via DSK2, does not disrupt switching"
+      }
+    }
+  },
+  "superSource": {
+    "presets": [
+      {
+        "name": "SS_2UP",
+        "sourceId": 6000,
+        "background": 10010,
+        "boxes": [
+          {
+            "index": 0,
+            "label": "LEFT",
+            "enabled": true,
+            "source": 1,
+            "position": { "x": -480, "y": 0 },
+            "size": 500,
+            "cropped": false
+          },
+          {
+            "index": 1,
+            "label": "RIGHT",
+            "enabled": true,
+            "source": 2,
+            "position": { "x": 480, "y": 0 },
+            "size": 500,
+            "cropped": false
+          },
+          { "index": 2, "enabled": false },
+          { "index": 3, "enabled": false }
+        ],
+        "border": {
+          "enabled": true,
+          "width": 50,
+          "hue": 0,
+          "saturation": 0,
+          "luma": 1000
+        }
+      }
+    ]
+  },
+  "transitions": {
+    "default": {
+      "style": "mix",
+      "rate": 25
+    },
+    "presets": [
+      { "name": "CUT", "style": "cut", "rate": 0 },
+      { "name": "MIX", "style": "mix", "rate": 25 },
+      { "name": "DIP", "style": "dip", "rate": 25 }
+    ]
+  },
+  "macros": [
+    { "name": "TAKE_CAM1", "description": "Cut CAM1 to Program", "actions": [{ "tool": "atem_set_program", "params": { "inputId": 1 } }] },
+    { "name": "TAKE_CAM2", "description": "Cut CAM2 to Program", "actions": [{ "tool": "atem_set_program", "params": { "inputId": 2 } }] },
+    { "name": "TAKE_CAM3", "description": "Cut CAM3 to Program", "actions": [{ "tool": "atem_set_program", "params": { "inputId": 3 } }] },
+    { "name": "TAKE_CAM4", "description": "Cut CAM4 to Program", "actions": [{ "tool": "atem_set_program", "params": { "inputId": 4 } }] },
+    { "name": "PVW_CAM1", "description": "Set CAM1 on Preview", "actions": [{ "tool": "atem_set_preview", "params": { "inputId": 1 } }] },
+    { "name": "PVW_CAM2", "description": "Set CAM2 on Preview", "actions": [{ "tool": "atem_set_preview", "params": { "inputId": 2 } }] },
+    { "name": "PVW_CAM3", "description": "Set CAM3 on Preview", "actions": [{ "tool": "atem_set_preview", "params": { "inputId": 3 } }] },
+    { "name": "PVW_CAM4", "description": "Set CAM4 on Preview", "actions": [{ "tool": "atem_set_preview", "params": { "inputId": 4 } }] },
+    { "name": "TAKE_SS_2UP", "description": "Cut SuperSource to Program", "actions": [{ "tool": "atem_set_program", "params": { "inputId": 6000 } }] },
+    { "name": "TITLE_TOGGLE", "description": "Toggle Title overlay on/off", "actions": [{ "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 0, "onAir": "toggle" } }] },
+    { "name": "LOGO_TOGGLE", "description": "Toggle Logo bug on/off", "actions": [{ "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 1, "onAir": "toggle" } }] },
+    {
+      "name": "SWAP_SS_BOXES",
+      "description": "Swap SuperSource left/right sources",
+      "actions": [
+        { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": 2 }, "note": "Set left box to CAM2" },
+        { "tool": "atem_set_supersource_box", "params": { "boxIndex": 1, "source": 1 }, "note": "Set right box to CAM1" }
+      ]
+    }
+  ]
+}

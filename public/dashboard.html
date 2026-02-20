@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>4Cam Show Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1a202c;
+    --surface: #2d3748;
+    --surface-hover: #4a5568;
+    --border: #4a5568;
+    --text: #e2e8f0;
+    --text-muted: #a0aec0;
+    --text-dim: #718096;
+    --red: #e53e3e;
+    --red-dark: #c53030;
+    --red-glow: rgba(229, 62, 62, 0.35);
+    --green: #38a169;
+    --green-glow: rgba(56, 161, 105, 0.35);
+    --amber: #d69e2e;
+    --amber-dark: #b7791f;
+    --amber-glow: rgba(214, 158, 46, 0.35);
+    --blue: #3182ce;
+    --blue-glow: rgba(49, 130, 206, 0.35);
+    --purple: #805ad5;
+    --purple-glow: rgba(128, 90, 213, 0.35);
+    --radius: 6px;
+    --transition: 0.15s ease;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* --- Header --- */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #171923;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .connection-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+    flex-shrink: 0;
+    transition: background var(--transition), box-shadow var(--transition);
+  }
+  .connection-dot.connected {
+    background: #48bb78;
+    box-shadow: 0 0 8px rgba(72, 187, 120, 0.6);
+  }
+  .header-right {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* --- Layout --- */
+  .dashboard {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* --- Sections --- */
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* --- Button Row --- */
+  .btn-row {
+    display: grid;
+    gap: 6px;
+  }
+  .btn-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .btn-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .btn-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .btn-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .btn-row.cols-1 { grid-template-columns: 1fr; }
+
+  /* --- Base Button --- */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background var(--transition), box-shadow var(--transition), border-color var(--transition), transform 0.08s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .btn:hover { background: var(--surface-hover); }
+  .btn:active { transform: scale(0.97); }
+  .btn:focus-visible { box-shadow: 0 0 0 2px var(--blue); }
+
+  /* Active states */
+  .btn.active-red {
+    background: var(--red);
+    border-color: var(--red);
+    box-shadow: 0 0 12px var(--red-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .btn.active-red:hover { background: #f56565; }
+  .btn.active-green {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 12px var(--green-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .btn.active-green:hover { background: #48bb78; }
+  .btn.active-amber {
+    background: var(--amber);
+    border-color: var(--amber);
+    box-shadow: 0 0 12px var(--amber-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+    color: #1a202c;
+  }
+  .btn.active-amber:hover { background: #ecc94b; }
+  .btn.active-blue {
+    background: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 0 12px var(--blue-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .btn.active-blue:hover { background: #4299e1; }
+  .btn.active-purple {
+    background: var(--purple);
+    border-color: var(--purple);
+    box-shadow: 0 0 12px var(--purple-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  .btn.active-purple:hover { background: #9f7aea; }
+
+  /* CUT / AUTO large buttons */
+  .btn-take {
+    min-height: 72px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .btn-cut {
+    background: var(--red-dark);
+    border-color: var(--red-dark);
+    color: #fff;
+  }
+  .btn-cut:hover { background: var(--red); }
+  .btn-cut:active { background: #9b2c2c; transform: scale(0.97); }
+  .btn-auto-take {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1a202c;
+  }
+  .btn-auto-take:hover { background: #ecc94b; }
+  .btn-auto-take:active { background: var(--amber-dark); transform: scale(0.97); }
+
+  /* SWAP button */
+  .btn-swap {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .btn-swap:hover { background: #9f7aea; }
+  .btn-swap:active { background: #6b46c1; transform: scale(0.97); }
+
+  /* AUTO overlay buttons */
+  .btn-dsk-auto {
+    background: var(--amber-dark);
+    border-color: var(--amber-dark);
+    color: #fff;
+  }
+  .btn-dsk-auto:hover { background: var(--amber); color: #1a202c; }
+
+  /* Overlay group */
+  .overlay-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .overlay-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .overlay-group-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* SuperSource section */
+  .ss-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ss-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ss-row-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 48px;
+  }
+  .ss-row .btn-row {
+    flex: 1;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+
+  /* Toast notifications */
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: #2d3748;
+    border: 1px solid #e53e3e;
+    border-left: 3px solid #e53e3e;
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    max-width: 360px;
+    animation: toast-in 0.2s ease, toast-out 0.3s ease 2.7s forwards;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    pointer-events: auto;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toast-out {
+    from { opacity: 1; }
+    to { opacity: 0; transform: translateY(-10px); }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .dashboard { padding: 12px 12px 32px; gap: 16px; }
+    .btn { min-height: 48px; font-size: 13px; }
+    .btn-take { min-height: 60px; font-size: 17px; }
+    .overlay-groups { grid-template-columns: 1fr; }
+    .header h1 { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="connection-dot" id="connDot"></div>
+    <h1>4Cam Show Dashboard</h1>
+  </div>
+  <div class="header-right" id="modelName">Connecting...</div>
+</div>
+
+<div class="dashboard">
+
+  <!-- PROGRAM -->
+  <div class="section">
+    <div class="section-label">Program</div>
+    <div class="btn-row cols-5" id="pgmRow">
+      <button class="btn" data-input="1" onclick="D.setPgm(1)">CAM1</button>
+      <button class="btn" data-input="2" onclick="D.setPgm(2)">CAM2</button>
+      <button class="btn" data-input="3" onclick="D.setPgm(3)">CAM3</button>
+      <button class="btn" data-input="4" onclick="D.setPgm(4)">CAM4</button>
+      <button class="btn" data-input="6000" onclick="D.setPgm(6000)">SS 2UP</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="section">
+    <div class="section-label">Preview</div>
+    <div class="btn-row cols-5" id="pvwRow">
+      <button class="btn" data-input="1" onclick="D.setPvw(1)">CAM1</button>
+      <button class="btn" data-input="2" onclick="D.setPvw(2)">CAM2</button>
+      <button class="btn" data-input="3" onclick="D.setPvw(3)">CAM3</button>
+      <button class="btn" data-input="4" onclick="D.setPvw(4)">CAM4</button>
+      <button class="btn" data-input="6000" onclick="D.setPvw(6000)">SS 2UP</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TAKE -->
+  <div class="section">
+    <div class="section-label">Take</div>
+    <div class="btn-row cols-2">
+      <button class="btn btn-take btn-cut" onclick="D.cut()">CUT</button>
+      <button class="btn btn-take btn-auto-take" onclick="D.auto()">AUTO</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TRANSITION -->
+  <div class="section">
+    <div class="section-label">Transition</div>
+    <div class="btn-row cols-3" id="transStyleRow">
+      <button class="btn" data-style="mix" onclick="D.setStyle('mix')">MIX</button>
+      <button class="btn" data-style="dip" onclick="D.setStyle('dip')">DIP</button>
+      <button class="btn" data-style="wipe" onclick="D.setStyle('wipe')">WIPE</button>
+    </div>
+    <div class="section-label" style="margin-top:6px">Rate</div>
+    <div class="btn-row cols-4" id="transRateRow">
+      <button class="btn" data-rate="10" onclick="D.setRate(10)">10f</button>
+      <button class="btn" data-rate="15" onclick="D.setRate(15)">15f</button>
+      <button class="btn" data-rate="25" onclick="D.setRate(25)">25f</button>
+      <button class="btn" data-rate="30" onclick="D.setRate(30)">30f</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- OVERLAYS -->
+  <div class="section">
+    <div class="section-label">Overlays</div>
+    <div class="overlay-groups">
+      <div class="overlay-group">
+        <div class="overlay-group-label">Title (DSK1)</div>
+        <div class="btn-row cols-3">
+          <button class="btn" id="dsk0On" onclick="D.setDsk(0,true)">ON</button>
+          <button class="btn" id="dsk0Off" onclick="D.setDsk(0,false)">OFF</button>
+          <button class="btn btn-dsk-auto" onclick="D.autoDsk(0)">AUTO</button>
+        </div>
+      </div>
+      <div class="overlay-group">
+        <div class="overlay-group-label">Logo (DSK2)</div>
+        <div class="btn-row cols-3">
+          <button class="btn" id="dsk1On" onclick="D.setDsk(1,true)">ON</button>
+          <button class="btn" id="dsk1Off" onclick="D.setDsk(1,false)">OFF</button>
+          <button class="btn btn-dsk-auto" onclick="D.autoDsk(1)">AUTO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SUPERSOURCE -->
+  <div class="section">
+    <div class="section-label">SuperSource</div>
+    <div class="ss-layout">
+      <div style="max-width:180px">
+        <button class="btn btn-swap" style="width:100%;min-height:48px" onclick="D.swap()">SWAP</button>
+      </div>
+      <div class="ss-row">
+        <span class="ss-row-label">Left</span>
+        <div class="btn-row cols-4">
+          <button class="btn" data-ss="0" data-input="1" onclick="D.setSs(0,1)">CAM1</button>
+          <button class="btn" data-ss="0" data-input="2" onclick="D.setSs(0,2)">CAM2</button>
+          <button class="btn" data-ss="0" data-input="3" onclick="D.setSs(0,3)">CAM3</button>
+          <button class="btn" data-ss="0" data-input="4" onclick="D.setSs(0,4)">CAM4</button>
+        </div>
+      </div>
+      <div class="ss-row">
+        <span class="ss-row-label">Right</span>
+        <div class="btn-row cols-4">
+          <button class="btn" data-ss="1" data-input="1" onclick="D.setSs(1,1)">CAM1</button>
+          <button class="btn" data-ss="1" data-input="2" onclick="D.setSs(1,2)">CAM2</button>
+          <button class="btn" data-ss="1" data-input="3" onclick="D.setSs(1,3)">CAM3</button>
+          <button class="btn" data-ss="1" data-input="4" onclick="D.setSs(1,4)">CAM4</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+var D = (function() {
+  'use strict';
+
+  // ---- State ----
+  var state = {
+    connected: false,
+    programInput: 0,
+    previewInput: 0,
+    transitionStyle: '',
+    transitionRate: 0,
+    dsk0OnAir: false,
+    dsk1OnAir: false,
+    ssBox0Source: 0,
+    ssBox1Source: 0
+  };
+
+  var reqId = 0;
+  var polling = false;
+  var pollSuppressToast = false;
+
+  // ---- MCP Tool Call ----
+  function callTool(name, args, silent) {
+    return fetch('/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: ++reqId,
+        method: 'tools/call',
+        params: { name: name, arguments: args || {} }
+      })
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function(json) {
+      if (json.error) throw new Error(json.error.message || 'MCP error');
+      var content = json.result && json.result.content;
+      if (content && content.length > 0 && content[0].type === 'text') {
+        return content[0].text;
+      }
+      return json.result;
+    })
+    .catch(function(err) {
+      if (!silent) showToast(err.message || String(err));
+      return null;
+    });
+  }
+
+  // ---- Parse JSON response helper ----
+  function parseJson(text) {
+    if (!text) return null;
+    if (typeof text === 'object') return text;
+    try { return JSON.parse(text); } catch(e) { return null; }
+  }
+
+  // ---- Actions ----
+  function setPgm(input) {
+    state.programInput = input;
+    updateUI();
+    callTool('atem_set_program', { input: input });
+  }
+
+  function setPvw(input) {
+    state.previewInput = input;
+    updateUI();
+    callTool('atem_set_preview', { input: input });
+  }
+
+  function doCut() {
+    callTool('atem_cut', {});
+  }
+
+  function doAuto() {
+    callTool('atem_auto_transition', {});
+  }
+
+  function setStyle(style) {
+    state.transitionStyle = style;
+    updateUI();
+    callTool('atem_set_transition_style', { style: style });
+  }
+
+  function setRate(rate) {
+    var style = state.transitionStyle || 'mix';
+    state.transitionRate = rate;
+    updateUI();
+    callTool('atem_set_transition_rate', { style: style, rate: rate });
+  }
+
+  function setDsk(dsk, onAir) {
+    if (dsk === 0) state.dsk0OnAir = onAir;
+    else state.dsk1OnAir = onAir;
+    updateUI();
+    callTool('atem_set_dsk_on_air', { dsk: dsk, onAir: onAir });
+  }
+
+  function autoDsk(dsk) {
+    callTool('atem_auto_dsk', { dsk: dsk });
+  }
+
+  function setSs(boxIndex, source) {
+    if (boxIndex === 0) state.ssBox0Source = source;
+    else state.ssBox1Source = source;
+    updateUI();
+    callTool('atem_set_supersource_box', {
+      boxIndex: boxIndex,
+      enabled: true,
+      source: source,
+      x: boxIndex === 0 ? -480 : 480,
+      y: 0,
+      size: 500,
+      cropped: false
+    });
+  }
+
+  function swap() {
+    var s0 = state.ssBox0Source;
+    var s1 = state.ssBox1Source;
+    if (!s0 && !s1) {
+      showToast('No SuperSource state to swap');
+      return;
+    }
+    state.ssBox0Source = s1;
+    state.ssBox1Source = s0;
+    updateUI();
+    callTool('atem_set_supersource_box', {
+      boxIndex: 0, enabled: true, source: s1,
+      x: -480, y: 0, size: 500, cropped: false
+    });
+    callTool('atem_set_supersource_box', {
+      boxIndex: 1, enabled: true, source: s0,
+      x: 480, y: 0, size: 500, cropped: false
+    });
+  }
+
+  // ---- UI Update ----
+  function setActive(selector, dataAttr, matchValue, activeClass) {
+    var btns = document.querySelectorAll(selector);
+    for (var i = 0; i < btns.length; i++) {
+      var val = dataAttr === 'input' ? parseInt(btns[i].dataset.input) :
+                dataAttr === 'style' ? btns[i].dataset.style :
+                dataAttr === 'rate' ? parseInt(btns[i].dataset.rate) :
+                btns[i].dataset[dataAttr];
+      if (val === matchValue) {
+        btns[i].className = 'btn ' + activeClass;
+      } else {
+        btns[i].className = 'btn';
+      }
+    }
+  }
+
+  function updateUI() {
+    // Program & Preview
+    setActive('#pgmRow .btn', 'input', state.programInput, 'active-red');
+    setActive('#pvwRow .btn', 'input', state.previewInput, 'active-green');
+
+    // Transition
+    setActive('#transStyleRow .btn', 'style', state.transitionStyle, 'active-amber');
+    setActive('#transRateRow .btn', 'rate', state.transitionRate, 'active-purple');
+
+    // DSK0
+    document.getElementById('dsk0On').className = 'btn' + (state.dsk0OnAir ? ' active-green' : '');
+    document.getElementById('dsk0Off').className = 'btn' + (!state.dsk0OnAir ? ' active-red' : '');
+
+    // DSK1
+    document.getElementById('dsk1On').className = 'btn' + (state.dsk1OnAir ? ' active-green' : '');
+    document.getElementById('dsk1Off').className = 'btn' + (!state.dsk1OnAir ? ' active-red' : '');
+
+    // SuperSource boxes
+    var ss0btns = document.querySelectorAll('[data-ss="0"]');
+    for (var i = 0; i < ss0btns.length; i++) {
+      var v = parseInt(ss0btns[i].dataset.input);
+      ss0btns[i].className = 'btn' + (v === state.ssBox0Source ? ' active-blue' : '');
+    }
+    var ss1btns = document.querySelectorAll('[data-ss="1"]');
+    for (var j = 0; j < ss1btns.length; j++) {
+      var w = parseInt(ss1btns[j].dataset.input);
+      ss1btns[j].className = 'btn' + (w === state.ssBox1Source ? ' active-blue' : '');
+    }
+
+    // Connection indicator
+    document.getElementById('connDot').className =
+      'connection-dot' + (state.connected ? ' connected' : '');
+  }
+
+  // ---- Polling ----
+  // Polls status, transition, and supersource in parallel every 500ms.
+  // Suppresses toasts during polling to avoid flooding on disconnect.
+  var pollCount = 0;
+
+  function pollStatus() {
+    if (polling) return; // skip if previous poll still running
+    polling = true;
+    pollSuppressToast = true;
+
+    // Fire all three polls in parallel
+    var pStatus = callTool('atem_get_status', {}, true);
+    var pTrans = callTool('atem_get_transition_state', {}, true);
+    // Only poll supersource every 4th cycle (2s) to reduce load
+    var pSS = (pollCount % 4 === 0)
+      ? callTool('atem_get_supersource_state', {}, true)
+      : Promise.resolve(null);
+
+    pollCount++;
+
+    Promise.all([pStatus, pTrans, pSS]).then(function(results) {
+      // Status
+      var data = parseJson(results[0]);
+      if (data) {
+        state.connected = !!data.connected;
+        if (data.programInput) state.programInput = data.programInput.id;
+        if (data.previewInput) state.previewInput = data.previewInput.id;
+
+        var modelEl = document.getElementById('modelName');
+        if (data.productId && data.productId !== 'Unknown') {
+          modelEl.textContent = data.productId;
+        } else if (data.connected) {
+          modelEl.textContent = 'ATEM Connected';
+        } else {
+          modelEl.textContent = 'Disconnected';
+        }
+      } else {
+        state.connected = false;
+        document.getElementById('modelName').textContent = 'Disconnected';
+      }
+
+      // Transition
+      var transData = parseJson(results[1]);
+      if (transData) {
+        var styleName = (transData.currentStyle || '').toLowerCase();
+        if (styleName) state.transitionStyle = styleName;
+        if (transData.rates && transData.rates[styleName] != null) {
+          state.transitionRate = transData.rates[styleName];
+        }
+      }
+
+      // SuperSource
+      var ssData = parseJson(results[2]);
+      if (ssData) {
+        var ssKey = Object.keys(ssData)[0];
+        if (ssKey && ssData[ssKey] && ssData[ssKey].boxes) {
+          var boxes = ssData[ssKey].boxes;
+          if (boxes['Box 1']) state.ssBox0Source = boxes['Box 1'].source || 0;
+          if (boxes['Box 2']) state.ssBox1Source = boxes['Box 2'].source || 0;
+        }
+      }
+
+      updateUI();
+      polling = false;
+      pollSuppressToast = false;
+    }).catch(function() {
+      state.connected = false;
+      updateUI();
+      polling = false;
+      pollSuppressToast = false;
+    });
+  }
+
+  // ---- Toast ----
+  function showToast(msg) {
+    if (pollSuppressToast) return;
+    var container = document.getElementById('toastContainer');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(function() {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 3000);
+  }
+
+  // ---- Init ----
+  pollStatus();
+  setInterval(pollStatus, 500);
+  updateUI();
+
+  // Public API for onclick handlers
+  return {
+    setPgm: setPgm,
+    setPvw: setPvw,
+    cut: doCut,
+    auto: doAuto,
+    setStyle: setStyle,
+    setRate: setRate,
+    setDsk: setDsk,
+    autoDsk: autoDsk,
+    setSs: setSs,
+    swap: swap
+  };
+
+})();
+</script>
+</body>
+</html>

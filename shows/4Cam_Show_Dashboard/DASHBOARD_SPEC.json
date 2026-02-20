@@ -1,0 +1,145 @@
+{
+  "dashboardName": "4Cam_Show_Dashboard",
+  "version": "1.0.0",
+  "mcpEndpoint": "/mcp",
+  "pollInterval": 250,
+  "stateSubscriptions": [
+    { "query": "atem_get_status", "fields": ["programInput", "previewInput"] },
+    { "query": "atem_get_transition_state", "fields": ["style", "rate", "inTransition"] }
+  ],
+  "layout": {
+    "sections": [
+      {
+        "id": "program",
+        "title": "PROGRAM",
+        "type": "button-row",
+        "style": { "activeColor": "#e53e3e", "inactiveColor": "#2d3748", "textColor": "#ffffff", "fontSize": "1.1rem", "minHeight": "64px" },
+        "buttons": [
+          { "id": "pgm_cam1", "label": "CAM1", "shortLabel": "1", "action": { "tool": "atem_set_program", "params": { "inputId": 1 } }, "stateKey": "programInput", "activeValue": 1 },
+          { "id": "pgm_cam2", "label": "CAM2", "shortLabel": "2", "action": { "tool": "atem_set_program", "params": { "inputId": 2 } }, "stateKey": "programInput", "activeValue": 2 },
+          { "id": "pgm_cam3", "label": "CAM3", "shortLabel": "3", "action": { "tool": "atem_set_program", "params": { "inputId": 3 } }, "stateKey": "programInput", "activeValue": 3 },
+          { "id": "pgm_cam4", "label": "CAM4", "shortLabel": "4", "action": { "tool": "atem_set_program", "params": { "inputId": 4 } }, "stateKey": "programInput", "activeValue": 4 },
+          { "id": "pgm_ss", "label": "SS 2UP", "shortLabel": "SS", "action": { "tool": "atem_set_program", "params": { "inputId": 6000 } }, "stateKey": "programInput", "activeValue": 6000 }
+        ]
+      },
+      {
+        "id": "preview",
+        "title": "PREVIEW",
+        "type": "button-row",
+        "style": { "activeColor": "#38a169", "inactiveColor": "#2d3748", "textColor": "#ffffff", "fontSize": "1.1rem", "minHeight": "64px" },
+        "buttons": [
+          { "id": "pvw_cam1", "label": "CAM1", "shortLabel": "1", "action": { "tool": "atem_set_preview", "params": { "inputId": 1 } }, "stateKey": "previewInput", "activeValue": 1 },
+          { "id": "pvw_cam2", "label": "CAM2", "shortLabel": "2", "action": { "tool": "atem_set_preview", "params": { "inputId": 2 } }, "stateKey": "previewInput", "activeValue": 2 },
+          { "id": "pvw_cam3", "label": "CAM3", "shortLabel": "3", "action": { "tool": "atem_set_preview", "params": { "inputId": 3 } }, "stateKey": "previewInput", "activeValue": 3 },
+          { "id": "pvw_cam4", "label": "CAM4", "shortLabel": "4", "action": { "tool": "atem_set_preview", "params": { "inputId": 4 } }, "stateKey": "previewInput", "activeValue": 4 },
+          { "id": "pvw_ss", "label": "SS 2UP", "shortLabel": "SS", "action": { "tool": "atem_set_preview", "params": { "inputId": 6000 } }, "stateKey": "previewInput", "activeValue": 6000 }
+        ]
+      },
+      {
+        "id": "transition",
+        "title": "TRANSITION",
+        "type": "mixed",
+        "children": [
+          {
+            "id": "transition_style",
+            "type": "button-row",
+            "style": { "activeColor": "#d69e2e", "inactiveColor": "#2d3748", "textColor": "#ffffff" },
+            "buttons": [
+              { "id": "trans_cut", "label": "CUT", "action": { "tool": "atem_set_transition_style", "params": { "style": "cut" } }, "stateKey": "transitionStyle", "activeValue": "cut" },
+              { "id": "trans_mix", "label": "MIX", "action": { "tool": "atem_set_transition_style", "params": { "style": "mix" } }, "stateKey": "transitionStyle", "activeValue": "mix" },
+              { "id": "trans_dip", "label": "DIP", "action": { "tool": "atem_set_transition_style", "params": { "style": "dip" } }, "stateKey": "transitionStyle", "activeValue": "dip" }
+            ]
+          },
+          {
+            "id": "transition_rate",
+            "type": "button-row",
+            "label": "MIX RATE",
+            "style": { "activeColor": "#805ad5", "inactiveColor": "#2d3748", "textColor": "#ffffff", "fontSize": "0.9rem" },
+            "buttons": [
+              { "id": "rate_10", "label": "10f", "action": { "tool": "atem_set_transition_rate", "params": { "rate": 10 } }, "stateKey": "transitionRate", "activeValue": 10 },
+              { "id": "rate_15", "label": "15f", "action": { "tool": "atem_set_transition_rate", "params": { "rate": 15 } }, "stateKey": "transitionRate", "activeValue": 15 },
+              { "id": "rate_25", "label": "25f", "action": { "tool": "atem_set_transition_rate", "params": { "rate": 25 } }, "stateKey": "transitionRate", "activeValue": 25 },
+              { "id": "rate_30", "label": "30f", "action": { "tool": "atem_set_transition_rate", "params": { "rate": 30 } }, "stateKey": "transitionRate", "activeValue": 30 }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "take",
+        "title": "TAKE",
+        "type": "button-row",
+        "buttons": [
+          { "id": "take_cut", "label": "CUT", "style": { "color": "#ffffff", "backgroundColor": "#c53030", "fontSize": "1.3rem", "fontWeight": "bold", "minHeight": "72px" }, "action": { "tool": "atem_cut", "params": {} } },
+          { "id": "take_auto", "label": "AUTO", "style": { "color": "#ffffff", "backgroundColor": "#d69e2e", "fontSize": "1.3rem", "fontWeight": "bold", "minHeight": "72px" }, "action": { "tool": "atem_auto_transition", "params": {} } }
+        ]
+      },
+      {
+        "id": "overlays",
+        "title": "OVERLAYS",
+        "type": "mixed",
+        "children": [
+          {
+            "id": "title_overlay",
+            "type": "button-group",
+            "label": "TITLE",
+            "buttons": [
+              { "id": "title_on", "label": "ON", "action": { "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 0, "onAir": true } }, "style": { "activeColor": "#38a169" } },
+              { "id": "title_off", "label": "OFF", "action": { "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 0, "onAir": false } }, "style": { "activeColor": "#e53e3e" } },
+              { "id": "title_toggle", "label": "TOGGLE", "action": { "tool": "atem_auto_dsk", "params": { "dskIndex": 0 } }, "style": { "color": "#d69e2e", "borderColor": "#d69e2e" } }
+            ],
+            "stateKey": "dsk0OnAir"
+          },
+          {
+            "id": "logo_overlay",
+            "type": "button-group",
+            "label": "LOGO",
+            "buttons": [
+              { "id": "logo_on", "label": "ON", "action": { "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 1, "onAir": true } }, "style": { "activeColor": "#38a169" } },
+              { "id": "logo_off", "label": "OFF", "action": { "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 1, "onAir": false } }, "style": { "activeColor": "#e53e3e" } },
+              { "id": "logo_toggle", "label": "TOGGLE", "action": { "tool": "atem_set_dsk_on_air", "params": { "dskIndex": 1, "onAir": true } }, "style": { "color": "#d69e2e", "borderColor": "#d69e2e" }, "toggleBehavior": true }
+            ],
+            "stateKey": "dsk1OnAir"
+          }
+        ]
+      },
+      {
+        "id": "supersource",
+        "title": "SUPERSOURCE",
+        "type": "mixed",
+        "children": [
+          {
+            "id": "ss_actions",
+            "type": "button-row",
+            "buttons": [
+              { "id": "ss_swap", "label": "SWAP", "style": { "backgroundColor": "#6b46c1", "color": "#ffffff", "fontSize": "1.1rem" }, "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": "__dynamic_swap__" }, "macro": "SWAP_SS_BOXES", "note": "Reads current state, swaps box 0 and box 1 sources" } }
+            ]
+          },
+          {
+            "id": "ss_left_source",
+            "type": "button-row",
+            "label": "LEFT SOURCE",
+            "style": { "activeColor": "#3182ce", "inactiveColor": "#2d3748" },
+            "buttons": [
+              { "id": "ss_left_cam1", "label": "CAM1", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": 1 } }, "stateKey": "ssBox0Source", "activeValue": 1 },
+              { "id": "ss_left_cam2", "label": "CAM2", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": 2 } }, "stateKey": "ssBox0Source", "activeValue": 2 },
+              { "id": "ss_left_cam3", "label": "CAM3", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": 3 } }, "stateKey": "ssBox0Source", "activeValue": 3 },
+              { "id": "ss_left_cam4", "label": "CAM4", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 0, "source": 4 } }, "stateKey": "ssBox0Source", "activeValue": 4 }
+            ]
+          },
+          {
+            "id": "ss_right_source",
+            "type": "button-row",
+            "label": "RIGHT SOURCE",
+            "style": { "activeColor": "#3182ce", "inactiveColor": "#2d3748" },
+            "buttons": [
+              { "id": "ss_right_cam1", "label": "CAM1", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 1, "source": 1 } }, "stateKey": "ssBox1Source", "activeValue": 1 },
+              { "id": "ss_right_cam2", "label": "CAM2", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 1, "source": 2 } }, "stateKey": "ssBox1Source", "activeValue": 2 },
+              { "id": "ss_right_cam3", "label": "CAM3", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 1, "source": 3 } }, "stateKey": "ssBox1Source", "activeValue": 3 },
+              { "id": "ss_right_cam4", "label": "CAM4", "action": { "tool": "atem_set_supersource_box", "params": { "boxIndex": 1, "source": 4 } }, "stateKey": "ssBox1Source", "activeValue": 4 }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
