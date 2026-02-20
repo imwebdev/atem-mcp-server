@@ -85,7 +85,7 @@ Quit and relaunch Claude Desktop. You should see the hammer (🔨) icon indicati
 
 If `ATEM_HOST` is set, the server auto-connects on startup. Otherwise, use `atem_connect` to connect manually.
 
-## Available Tools (30 tools)
+## Available Tools (36 tools)
 
 ### Connection
 | Tool | Description |
@@ -146,6 +146,20 @@ If `ATEM_HOST` is set, the server auto-connects on startup. Otherwise, use `atem
 | `atem_set_audio_mixer_input` | Set input gain, balance, mix mode |
 | `atem_set_audio_master_output` | Set master output gain |
 | `atem_get_audio_state` | Get full audio mixer state |
+
+### SuperSource
+| Tool | Description |
+|------|-------------|
+| `atem_get_supersource_state` | Get SuperSource box and border configuration |
+| `atem_set_supersource_box` | Configure box position, size, source, crop |
+| `atem_set_supersource_border` | Configure SuperSource border properties |
+
+### Media & Input Labels
+| Tool | Description |
+|------|-------------|
+| `atem_set_input_label` | Set short and long labels for an input |
+| `atem_get_media_pool` | Get media pool stills, clips, and player state |
+| `atem_set_media_player_source` | Set media player source (still or clip) |
 
 ## Common Input IDs
 
